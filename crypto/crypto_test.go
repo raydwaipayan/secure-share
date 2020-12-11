@@ -17,7 +17,7 @@ func TestCrypto(t *testing.T) {
 		t.Errorf("Random data generation failed")
 	}
 	if _, err := io.ReadFull(rand.Reader, key); err != nil {
-		t.Errorf("Random data generation failed")
+		t.Errorf("Random key generation failed")
 	}
 
 	encdata, err := encrypt(data, key)
