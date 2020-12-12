@@ -14,6 +14,12 @@ func main() {
 
 	conf := config.Load()
 
+	// ping address
+	r.GET("/ping", func(c *gin.Context) {
+		c.JSON(200, gin.H{
+			"message": "pong",
+		})
+	})
 	// Listen and serve on :Port
 	r.Run(fmt.Sprintf(":%v", conf.Port))
 }
