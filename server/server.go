@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/gin-gonic/gin"
-	"github.com/raydwaipayan/secure-server/config"
+	"github.com/raydwaipayan/secure-share/config"
 )
 
 func main() {
