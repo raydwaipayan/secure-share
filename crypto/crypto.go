@@ -7,7 +7,9 @@ import (
 	"io"
 )
 
-func encrypt(data []byte, key []byte) ([]byte, error) {
+// Encrypt takes in original data and key and
+// returns encrypted data
+func Encrypt(data []byte, key []byte) ([]byte, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return nil, err
@@ -30,7 +32,9 @@ func encrypt(data []byte, key []byte) ([]byte, error) {
 	return encdata, nil
 }
 
-func decrypt(data []byte, key []byte) ([]byte, error) {
+// Decrypt Takes in encrypted data and key and
+// returns decrypted data
+func Decrypt(data []byte, key []byte) ([]byte, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return nil, err

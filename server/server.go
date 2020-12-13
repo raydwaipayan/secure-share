@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/raydwaipayan/secure-share/config"
+	"github.com/raydwaipayan/secure-share/server/routes"
 )
 
 func main() {
@@ -20,6 +21,10 @@ func main() {
 			"message": "pong",
 		})
 	})
+
+	// Register routes
+	routes.RegisterRoutes(r)
+
 	// Listen and serve on :Port
 	r.Run(fmt.Sprintf(":%v", conf.Port))
 }

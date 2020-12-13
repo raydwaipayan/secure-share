@@ -20,12 +20,12 @@ func TestCrypto(t *testing.T) {
 		t.Errorf("Random key generation failed")
 	}
 
-	encdata, err := encrypt(data, key)
+	encdata, err := Encrypt(data, key)
 	if err != nil {
 		t.Errorf("Encryption failed")
 	}
 
-	decdata, err := decrypt(encdata, key)
+	decdata, err := Decrypt(encdata, key)
 	if err != nil {
 		t.Errorf("Decryption failed")
 	}
