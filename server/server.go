@@ -5,6 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/raydwaipayan/secure-share/config"
+	"github.com/raydwaipayan/secure-share/server/middlewares"
 	"github.com/raydwaipayan/secure-share/server/routes"
 )
 
@@ -12,6 +13,7 @@ func main() {
 	r := gin.New()
 	r.Use(gin.Logger())
 	r.Use(gin.Recovery())
+	r.Use(middlewares.CORSMiddleware())
 
 	conf := config.Load()
 
