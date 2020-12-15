@@ -1,4 +1,5 @@
-FROM node:lts-alpine
+# Build Stage
+FROM node:lts-alpine as builder
 
 WORKDIR /app
 COPY package.json ./
@@ -7,11 +8,17 @@ RUN apk add --no-cache curl git && cd /tmp && \
     mv -v node-prune /usr/local/bin && rm -rvf
 
 RUN npm install && node-prune && npm cache clean --force
-RUN npm i -g serve
 
 COPY . ./
 RUN yarn build
 
 ENV HOST 0.0.0.0
+
+# Production Stage
+FROM node:lts-alpine
+COPY --from=builder /app/dist /dist
+
+RUN npm install -g serve
+
 EXPOSE 3000
 CMD ["serve", "-l", "3000", "-s", "dist"]
