@@ -137,7 +137,7 @@ export default {
         url: "/file/retrieve",
         method: "post",
         data: formdata,
-        responseType: "text",
+        responseType: "blob",
       })
         .then((response) => {
           var fileURL = window.URL.createObjectURL(new Blob([response.data]));
@@ -149,8 +149,9 @@ export default {
 
           fileLink.click();
         })
-        .catch((error) => {
-          this.downloaderror = error.response.data;
+        .catch(async (error) => {
+          const text = await new Response(error.response.data).text()
+          this.downloaderror = text;
         });
     },
   },

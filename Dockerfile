@@ -7,6 +7,7 @@ RUN GOOS=linux CGO_ENABLED=0 GOARCH=amd64 go build -ldflags="-w -s" -o bin/serve
 
 # Production stage
 FROM scratch
+WORKDIR /app
 
-COPY --from=builder /app/bin/server /bin/server
-ENTRYPOINT ["/bin/server"]
+COPY --from=builder /app/bin/server /app/server
+ENTRYPOINT ["/app/server"]
