@@ -47,6 +47,8 @@
                     </v-card-text>
                     <v-btn
                       large
+                      :loading="loading"
+                      :disabled="loading"
                       color="purple darken-2"
                       class="white--text ml-6"
                       @click="download()"
@@ -59,9 +61,12 @@
                     <v-card-text v-if="downloaderror" class="red--text text-h5">
                       {{ downloaderror }}
                       <div>
-                      <a class="red--text text-h6" @click="$router.push({ path: '/' })">
-                        Go Back?</a
-                      >
+                        <a
+                          class="red--text text-h6"
+                          @click="$router.push({ path: '/' })"
+                        >
+                          Go Back?</a
+                        >
                       </div>
                     </v-card-text>
                   </v-card>
@@ -85,6 +90,7 @@ export default {
       data: null,
       query: null,
       downloaderror: null,
+      loading: false,
     };
   },
   beforeRouteEnter(to, from, next) {
@@ -130,6 +136,7 @@ export default {
       }
     },
     download() {
+      this.loading = true;
       let formdata = new FormData();
       formdata.append("fileid", this.query.fileid);
       formdata.append("key", this.query.key);
@@ -150,8 +157,11 @@ export default {
           fileLink.click();
         })
         .catch(async (error) => {
-          const text = await new Response(error.response.data).text()
+          const text = await new Response(error.response.data).text();
           this.downloaderror = text;
+        })
+        .finally(() => {
+          this.loading = false;
         });
     },
   },
