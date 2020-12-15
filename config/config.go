@@ -15,7 +15,7 @@ type Config struct {
 func Load() Config {
 	viper.AutomaticEnv()
 
-	viper.BindEnv("Port", "PORT")
+	viper.BindEnv("Port", "SERVER_PORT")
 	viper.SetDefault("Port", "8080")
 
 	var conf Config

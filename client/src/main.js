@@ -14,8 +14,8 @@ Vue.use(VueRouter);
 Vue.use(VueAxios, axios);
 Vue.use(VueClipboard);
 
-axios.defaults.baseURL = process.env.baseURL || "http://localhost:8080";
-Vue.prototype.$clientUri = process.env.clientURL || "http://localhost:3000";
+axios.defaults.baseURL = process.env.VUE_APP_BASE_URL || "http://localhost:8080";
+Vue.prototype.$clientUri = process.env.VUE_APP_CLIENT_URL || "http://localhost:3000";
 Vue.config.productionTip = false;
 
 const routes = [

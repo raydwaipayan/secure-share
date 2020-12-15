@@ -1,0 +1,29 @@
+version: '3.7'
+
+volumes:
+    data:
+        driver: local
+
+services:
+
+    server:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        ports:
+            - 8080:8080
+        volumes:
+            - data:/app/data
+        env_file:
+            - ./.env
+
+    client:
+        build:
+            context: ./client
+            dockerfile: Dockerfile
+        ports:
+            - 3000:3000
+        env_file:
+            - ./.env
+        depends_on:
+            - server
