@@ -1,15 +1,33 @@
 -include ./env
-GOBIN=go
-BUILD_SRC=./server/*.go
 TIMEOUT=20
 
+GOBIN=go
+GO_BUILD=$(GOBIN) build
+GO_RUN=$(GOBIN) run
+GO_TEST=$(GOBIN) test -timeout $(TIMEOUT)
+
+SERVER_SRC=./server
+SERVER_FILES=$(SERVER_SRC)/*.go
+
+CLIENT_SRC=./client
+CLIENT_BUILD=yarn build
+CLIENT_RUN=yarn serve
+
+
 test:
-	$(GOBIN) test -v ./server/... ./crypto/...
+	$(GO_TEST) -v ./server/... ./crypto/...
 
-build:
-	$(GOBIN) build $(BUILD_SRC)
+build-server:
+	$(GO_BUILD) $(SERVER_FILES)
 
-run:
-	$(GOBIN) run $(BUILD_SRC)
+build-client:
+	cd $(CLIENT_SRC) && $(CLIENT_BUILD)
 
+run-server:
+	$(GO_RUN) $(SERVER_FILES)
 
+run-client:
+	cd $(CLIENT_SRC) && $(CLIENT_RUN)
+
+run-all:
+	$(GO_RUN) $(SERVER_FILES) & cd $(CLIENT_SRC) && $(CLIENT_RUN) && fg

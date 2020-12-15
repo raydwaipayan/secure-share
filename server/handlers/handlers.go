@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/rand"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"io"
@@ -27,6 +28,18 @@ const (
 // Filedata wraps over the file object
 type Filedata struct {
 	File *multipart.FileHeader `form:"file" binding:"required"`
+}
+
+// Metadata wraps the file metadata
+type Metadata struct {
+	Name string `json:"name"`
+	Size int64  `json:"size"`
+}
+
+// FileRequest is a wrapper over the request object
+type FileRequest struct {
+	Fileid string `json:"fileid" form:"fileid" binding:"required"`
+	Key    string `json:"key" form:"key" binding:"required"`
 }
 
 func genFileID(filename string) string {
@@ -121,6 +134,18 @@ func Submit(c *gin.Context) {
 		return
 	}
 
+	metadata, _ := json.Marshal(Metadata{
+		Name: filedata.File.Filename,
+		Size: filedata.File.Size,
+	})
+
+	err = writeFile(metadata, filepath.Join(wd, "data", fmt.Sprintf("%s_metadata.json", fileid)))
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Filesystem write Error")
+		log.Print(err)
+		return
+	}
+
 	err = writeFile(encdata, filepath.Join(wd, "data", fileid))
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Filesystem write Error")
@@ -129,7 +154,6 @@ func Submit(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"status": "Success",
 		"key":    hex.EncodeToString(key),
 		"fileid": fileid,
 	})
@@ -137,17 +161,14 @@ func Submit(c *gin.Context) {
 
 // Retrieve handler takes care of decrypting and returning the file
 func Retrieve(c *gin.Context) {
-	fileid := c.Query("file")
-	filename, err := getFileName(fileid)
-	if err != nil {
-		c.String(http.StatusInternalServerError, "Invalid fileid")
-		log.Print(err)
+	var req FileRequest
+	if err := c.ShouldBind(&req); err != nil {
+		c.String(http.StatusBadRequest, "bad request")
 		return
 	}
 
-	hexkey := c.Query("key")
+	fileid := req.Fileid
 	wd, _ := os.Getwd()
-
 	data, err := readFile(filepath.Join(wd, "data", fileid))
 	if err != nil {
 		c.String(http.StatusInternalServerError, "File doesn't exist")
@@ -155,7 +176,7 @@ func Retrieve(c *gin.Context) {
 		return
 	}
 
-	key, err := hex.DecodeString(hexkey)
+	key, err := hex.DecodeString(req.Key)
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Invalid key format")
 		log.Print(err)
@@ -169,15 +190,46 @@ func Retrieve(c *gin.Context) {
 		return
 	}
 
-	// Delete the file after first access
+	// Delete the file and metadata after first access
 	err = os.Remove(filepath.Join(wd, "data", fileid))
 	if err != nil {
 		log.Print(err)
 	}
 
+	err = os.Remove(filepath.Join(wd, "data", fmt.Sprintf("%s_metadata.json", fileid)))
+	if err != nil {
+		log.Print(err)
+	}
+
+	filename, _ := getFileName(fileid)
 	c.Writer.WriteHeader(http.StatusOK)
 	c.Header("Content-Disposition", fmt.Sprintf("attachment; filename=%s", filename))
 	c.Header("Content-Type", "application/octet-stream")
 	c.Header("Content-Length", fmt.Sprintf("%d", len(decdata)))
 	c.Writer.Write(decdata)
+}
+
+// Info returns metadata info about the file
+func Info(c *gin.Context) {
+	fileid, _ := c.GetQuery("fileid")
+	wd, _ := os.Getwd()
+	data, err := readFile(filepath.Join(wd, "data", fmt.Sprintf("%s_metadata.json", fileid)))
+	if err != nil {
+		c.String(http.StatusInternalServerError, "File doesn't exist")
+		log.Print(err)
+		return
+	}
+
+	var metadata Metadata
+	err = json.Unmarshal(data, &metadata)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "Metadata is corrupted")
+		log.Print(err)
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"name": metadata.Name,
+		"size": metadata.Size,
+	})
 }

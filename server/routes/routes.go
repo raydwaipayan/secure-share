@@ -9,6 +9,7 @@ import (
 func RegisterRoutes(router *gin.Engine) {
 	g := router.Group("/file")
 
-	g.POST("/put", handlers.Submit)
-	g.GET("/get", handlers.Retrieve)
+	g.POST("/submit", handlers.Submit)
+	g.POST("/retrieve", handlers.Retrieve)
+	g.GET("/info", handlers.Info)
 }
