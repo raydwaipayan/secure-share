@@ -6,8 +6,7 @@
 <p>
 Share files securely over network.
 </br>
-All the files are encrypted in storage,
-and deleted after first access.
+Written with Golang + Vue.
 </div>
 
 ## Inspiration
