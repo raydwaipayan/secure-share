@@ -58,6 +58,16 @@
                         mdi-cloud-download
                       </v-icon>
                     </v-btn>
+                    <div class="ma-6">
+                      <v-progress-linear
+                        v-model="downloadprogress"
+                        :active="loading"
+                        rounded
+                        height="5"
+                        color="purple --accent-4"
+                        value="15"
+                      ></v-progress-linear>
+                    </div>
                     <v-card-text v-if="downloaderror" class="red--text text-h5">
                       {{ downloaderror }}
                       <div>
@@ -91,6 +101,7 @@ export default {
       query: null,
       downloaderror: null,
       loading: false,
+      downloadprogress: 0,
     };
   },
   beforeRouteEnter(to, from, next) {
@@ -145,6 +156,10 @@ export default {
         method: "post",
         data: formdata,
         responseType: "blob",
+        onDownloadProgress: (progressEvent) => {
+            var percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+            this.downloadprogress=percentCompleted
+        },
       })
         .then((response) => {
           var fileURL = window.URL.createObjectURL(new Blob([response.data]));
