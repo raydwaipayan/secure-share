@@ -25,7 +25,7 @@
 export default {
   data: () => ({
     icons: [
-      { code: "mdi-home", link: process.env.ClientURI },
+      { code: "mdi-home", link: process.env.VUE_APP_CLIENT_URL },
       { code: "mdi-github", link: "https://github.com/raydwaipayan" },
     ],
     items: ["default", "absolute", "fixed"],
